@@ -1,7 +1,11 @@
+using StackExchangeRedisApp.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSingleton<RedisService>(); //Uygulama ayaða kalktýðýnda bir nesne örneði oluþturmasý yeterli her istekte oluþturmasýný istemediðimiz için AddSingleton yapabiliriz.
 
 var app = builder.Build();
 
@@ -19,6 +23,13 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
+
+// Bu þekilde RedisService için bir instance yaratýlýp o service içinde yazýlan connect methodu program baþlatýldýðýnda çaðýrýlmýþ olur.
+using (var scope = app.Services.CreateScope())
+{
+    var redisService = scope.ServiceProvider.GetRequiredService<RedisService>();
+    redisService.Connect();
+}
 
 app.MapControllerRoute(
     name: "default",
